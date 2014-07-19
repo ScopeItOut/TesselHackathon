@@ -14,10 +14,9 @@ var postTweets = function(){
   while(latestTweets.length > 0){
     var currentResponse = latestTweets.pop();
     var responseMsg = 'Hello @' + currentResponse.user;
-    // twit.updateStatus(responseMsg, function(data){
-    //   console.log(data);
-    // });
-    console.log(responseMsg);
+    twit.updateStatus(responseMsg, function(){
+      console.log('Tweet posted to: @' + currentResponse.user);
+    });
   }
 
   // twit.updateStatus(tweetString,
@@ -39,7 +38,6 @@ var getMentions = function(){
         responseObj.user =  currentTweet.user.screen_name;
         responseObj.text = currentTweet.text;
         latestTweets.push(responseObj);
-        console.log(latestTweets);
       }
       postTweets();
       console.log(latestTweets);      
