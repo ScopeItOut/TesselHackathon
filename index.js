@@ -1,34 +1,55 @@
 var tessel = require('tessel');
+var keys = require('./keys.js');
 var util = require('util');
-
-console.log("im here");
-
 var twitter = require('twitter');
 var wit = require('./wit.js');
+var path = require('path');
 var twit = new twitter({
-    consumer_key: 'iu4DxyyfZuUuOEkEcJ8cnK4PI',
-    consumer_secret: 'M8QnfjczwmAFrsMrQpPqzNNeJDTJLQ2nZHr9k2jh0mfvXjDqt5',
-    access_token_key: '2660028410-kKaP8jnAIsxw6VIzsP75hWjAHQUROamBKpqIIEM',
-    access_token_secret: 'dXGr78LyRoj0R1VDzfNR1GVKCFojSxDu6VF7jOksgYjfr'
+    consumer_key: keys.consumer_key,
+    consumer_secret: keys.consumer_secret,
+    access_token_key: keys.access_token_key,
+    access_token_secret: keys.access_token_secret
 });
+
+var otherTwitter = require('node-twitter');
+var twitterRestClient = new otherTwitter.RestClient(
+  keys.consumer_key,
+  keys.consumer_secret,
+  keys.access_token_key,
+  keys.access_token_secret
+);
 
 
 var latestId = '490565814072782848';
 
-var postTweets = function(tweets){
-  while(tweets.length > 0){
-    var currentResponse = tweets.pop();
-    var responseMsg = 'Hello @' + currentResponse.user;
-    twit.updateStatus(responseMsg, function(){
-      console.log('Tweet posted to: @' + currentResponse.user);
-    });
-  }
+var dummyNoise = 'It\'s so loud!';
+var dummyImage = '/thermometer-01.jpg';
+var dummyTemperature = '98º';
 
-  // twit.updateStatus(tweetString,
-  //   function(data) {
-  //     console.log(data);
-  //   }
-  // );  
+
+var postTweet = function(str){
+  
+  twit.updateStatus(str, function(){
+    console.log(str);
+  });
+};
+
+var postTweetImage = function(str){
+  //https://api.twitter.com/1.1/statuses/update_with_media.json
+  //Twitter.prototype.post = function(url, content, content_type, callback)
+  twitterRestClient.statusesUpdateWithMedia({
+    'status': str,
+    'media[]': path.join(__dirname, dummyImage)
+    },
+    function(error, result) {
+      if(error){
+        console.log('Error: ' + (error.code ? error.code + ' ' + error.message : error.message));
+      }
+      if(result){
+        console.log(str);
+      }
+    }
+);
 };
 
 var getMentions = function(callback){
@@ -54,15 +75,32 @@ var getMentions = function(callback){
 
 
 var app = function() {
+  var noiseResponse = '\nThe noise level is currently: ' + dummyNoise;
+  var photoResponse = '\nHere\'s a photo of the space: ';
+  var temperatureResponse = '\n The temperature is always perfect here!';
 
   getMentions(function(data) {
     for (var i = 0; i < data.length; i ++ ) {
-      var txt = 
-      wit.getWitForMessage(data[i], function(witResult) {
-        console.log(witResult);
-        //call neil
-        //with results from neil, post tweet
-          //construct tweet with username, text, photo?
+      wit.getWitForMessage(data[i], function(witResponse) {
+        var responseMsg = 'Hello @' + witResponse.message.user + ":";
+        if(witResponse.intent === 'general_conditions'){
+          responseMsg += noiseResponse;
+          responseMsg += temperatureResponse;
+          responseMsg += photoResponse;
+          postTweetImage(responseMsg);
+        }
+        else if(witResponse.intent === 'noise_level'){
+          responseMsg += noiseResponse;
+          postTweet(responseMsg);
+        }
+        else if(witResponse.intent === 'photo'){
+          responseMsg += photoResponse;
+          postTweetImage(responseMsg);
+        }
+        else if(witResponse.intent === 'temperature'){
+          responseMsg += temperatureResponse;
+          postTweet(responseMsg);
+        }
       });
     }
   });
@@ -70,6 +108,9 @@ var app = function() {
 
 app();
 
+//have access to variables on server
+//with results from server, post tweet
+  //construct tweet with username, text, photo?
 //get all at mentions
 //pass along new ones to wit
 //take result from wit, pass to neil

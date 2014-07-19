@@ -19,7 +19,7 @@ var wit = {
         console.log("Error getting Wit: " + error);
       } else {
         body = JSON.parse(body);
-        callback({message: message, witResult: body["outcomes"][0]["intent"]});
+        callback({message: message, intent: body["outcomes"][0]["intent"]});
       }
 
     });
