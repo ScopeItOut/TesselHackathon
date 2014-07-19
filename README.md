@@ -1,5 +1,5 @@
 ###Scope it Out
-Tessel responds to twitter messages to scope out your venue of choice!
+Tessel responds to twitter messages to scope out your venue of choice! The tessel will constantly relay pictures and ambient from a location to a node server. This node server is set up to respond to twitter mentions, using natural language processing. The twitter bot will tweet back with the requested information.
 
 ####You need:
 1. A twitter application API key
@@ -11,7 +11,7 @@ Tessel responds to twitter messages to scope out your venue of choice!
 ####To Use:
 1. Clone this repo
 1. npm install
-1. Input your 4 api keys into the index.js file
+1. Input your 4 twitter api keys into the index.js file
 1. Connect modules to tessel.
 1. Plug in tessel via USB.
 1. Run index.js with node in your terminal from the project's root directory.
