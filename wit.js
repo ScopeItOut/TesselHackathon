@@ -1,4 +1,5 @@
 var request = require('request');
+var keys = require('./keys.js');
 
 
 var wit = {
@@ -10,7 +11,7 @@ var wit = {
     var options = {
       url: url,
       headers: {
-        'Authorization': 'Bearer J3L5HDVCHGVDYLJRIQUHN7PKYKRP43LV'
+        'Authorization': keys.witAuth
       }
     };
 
