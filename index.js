@@ -1,4 +1,8 @@
+var tessel = require('tessel');
 var util = require('util');
+
+console.log("im here");
+
 var twitter = require('twitter');
 var wit = require('./wit.js');
 var twit = new twitter({
@@ -30,7 +34,6 @@ var postTweets = function(tweets){
 var getMentions = function(callback){
   latestTweets = [];
   twit.get('/statuses/mentions_timeline.json', { count: 10, since_id : latestId}, function(data){
-
     if(data.length === 0){
       console.log('No New Mentions!');
     } else {
