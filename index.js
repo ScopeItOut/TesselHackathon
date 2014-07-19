@@ -1,6 +1,6 @@
 var util = require('util');
 var twitter = require('twitter');
-var wit = requre('./wit.js');
+var wit = require('./wit.js');
 var twit = new twitter({
     consumer_key: 'iu4DxyyfZuUuOEkEcJ8cnK4PI',
     consumer_secret: 'M8QnfjczwmAFrsMrQpPqzNNeJDTJLQ2nZHr9k2jh0mfvXjDqt5',
@@ -8,12 +8,12 @@ var twit = new twitter({
     access_token_secret: 'dXGr78LyRoj0R1VDzfNR1GVKCFojSxDu6VF7jOksgYjfr'
 });
 
-var latestTweets = [];
+
 var latestId = '490565814072782848';
 
-var postTweets = function(){
-  while(latestTweets.length > 0){
-    var currentResponse = latestTweets.pop();
+var postTweets = function(tweets){
+  while(tweets.length > 0){
+    var currentResponse = tweets.pop();
     var responseMsg = 'Hello @' + currentResponse.user;
     twit.updateStatus(responseMsg, function(){
       console.log('Tweet posted to: @' + currentResponse.user);
@@ -27,8 +27,10 @@ var postTweets = function(){
   // );  
 };
 
-var getMentions = function(){
+var getMentions = function(callback){
+  latestTweets = [];
   twit.get('/statuses/mentions_timeline.json', { count: 10, since_id : latestId}, function(data){
+
     if(data.length === 0){
       console.log('No New Mentions!');
     } else {
@@ -40,17 +42,41 @@ var getMentions = function(){
         responseObj.text = currentTweet.text;
         latestTweets.push(responseObj);
       }
-      postTweets();
-      console.log(latestTweets);      
+      callback(latestTweets);
+
+    }
+  });
+
+};
+
+
+var app = function() {
+
+  getMentions(function(data) {
+    for (var i = 0; i < data.length; i ++ ) {
+      var txt = 
+      wit.getWitForMessage(data[i], function(witResult) {
+        console.log(witResult);
+        //call neil
+        //with results from neil, post tweet
+          //construct tweet with username, text, photo?
+      });
     }
   });
 };
 
+app();
+
+//get all at mentions
+//pass along new ones to wit
+//take result from wit, pass to neil
+//neil will send back tweet text or image
+//take this and tweet it at the mentioner
 
 
 
-getMentions();
+// getMentions();
 
-setInterval(function(){
-  getMentions();
-}, 61000);
+// setInterval(function(){
+//   getMentions();
+// }, 61000);
