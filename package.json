@@ -19,6 +19,7 @@
   "dependencies": {
     "ambient-attx4": "^0.1.8",
     "request": "^2.37.0",
-    "tessel": "^0.3.8"
+    "tessel": "^0.3.8",
+    "twitter": "^0.2.9"
   }
 }
