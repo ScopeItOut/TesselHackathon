@@ -1,5 +1,6 @@
 var util = require('util');
 var twitter = require('twitter');
+var wit = requre('./wit.js');
 var twit = new twitter({
     consumer_key: 'iu4DxyyfZuUuOEkEcJ8cnK4PI',
     consumer_secret: 'M8QnfjczwmAFrsMrQpPqzNNeJDTJLQ2nZHr9k2jh0mfvXjDqt5',
