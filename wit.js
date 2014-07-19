@@ -2,10 +2,10 @@ var request = require('request');
 
 
 var wit = {
-  getWitForMessage: function(message) {
+  getWitForMessage: function(message, callback) {
 
     var url = 'https://api.wit.ai/message?v=20140719&q=' +
-              encodeURIComponent(message);
+              encodeURIComponent(message.text);
 
     var options = {
       url: url,
@@ -19,8 +19,7 @@ var wit = {
         console.log("Error getting Wit: " + error);
       } else {
         body = JSON.parse(body);
-        console.log(body["outcomes"][0]["intent"]);
-        return body["outcomes"][0]["intent"];
+        callback({message: message, witResult: body["outcomes"][0]["intent"]});
       }
 
     });
