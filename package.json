@@ -18,6 +18,7 @@
   "homepage": "https://github.com/KiaFathi/TesselHackathon",
   "dependencies": {
     "ambient-attx4": "^0.1.8",
+    "express": "^4.6.1",
     "node-twitter": "^0.5.2",
     "request": "^2.37.0",
     "tessel": "^0.3.8",
