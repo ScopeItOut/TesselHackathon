@@ -1,38 +1,73 @@
+
+
+
 var tessel = require('tessel');
+var sum = 0;
+var avg = 0;
+var noiseLevel = "Initial";
+var fs = require('fs');
 
-// var camera = require('camera-vc0706').use(tessel.port['A']);
+
+var camera = require('camera-vc0706').use(tessel.port['A']);
 var ambient = require('ambient-attx4').use(tessel.port['B']);
+var http = require('http');
 
-ambient.on('ready', function () {
- // Get points of light and sound data.
-  setInterval( function () {
-    
-      ambient.getSoundLevel( function(err, sdata) {
-        console.log("Sound Level:", sdata.toFixed(8));
-    });
-  }, 1000); // The readings will happen every .5 seconds unless the trigger is hit
+module.exports.getSound = function(cb){
 
-  
+	ambient.on('ready', function () {
+	 // Get array buffer of sound data.
+	  
+	      ambient.getSoundBuffer( function(err, sdata) {
+	        console.log("Sound Level:", sdata);
+	        if(Array.isArray(sdata)) console.log("Yeah");
+					  for(var i=0; i<sdata.length;i++){
+							sum += sdata[i];
+						}
+						avg = sum/sdata.length;
+						console.log("Average Sound is ", avg);
 
-  // Set a sound level trigger - The trigger is a float between 0 and 1
-  ambient.setSoundTrigger(0.1);
+						if(avg<0.1){
+							noiseLevel = "Quiet";
+						} else if (avg>0.1 && avg<0.15){
+							noiseLevel = "Meh";
+						} else {
+							noiseLevel = "Loud";
+						}
+						// return noiseLevel;
+						cb(noiseLevel)
+	      });
+	}); 
 
-  ambient.on('sound-trigger', function(data) {
-    console.log("Something happened with sound: ", data);
+	ambient.on('error', function (err) {
+	  console.log(err)
+	});
+}
 
-    // Clear it
-    ambient.clearSoundTrigger();
+module.exports.getImage = function(cb){
 
-    //After 1.5 seconds reset sound trigger
-    setTimeout(function () {
+	var notificationLED = tessel.led[3]; 
+	camera.on('ready', function() {
+	  notificationLED.high();
+	  // Take the picture
+	  camera.takePicture(function(err, image) {
+	    if (err) {
+	      console.log('error taking image', err);
+	    } else {
+	      notificationLED.low();
+	      // Name the image
+	      var name = 'douglas.jpg';
+	      fs.writeFileSync('/app/tessel-code/scopeOut/douglas.jpg',image,'binary');
+	      // Save the image
+	      console.log('Picture saving as', name, '...');
+	      // console.log('Sending Image');
 
-        ambient.setSoundTrigger(0.1);
+	      cb(image)
+	      
+	      // Turn the camera off to end the script
+	      camera.disable();
+	    }
+	  });
+	});
 
-    },1500);
+}
 
-  });
-});
-
-ambient.on('error', function (err) {
-  console.log(err)
-});
