@@ -19,6 +19,7 @@ var twitterRestClient = new otherTwitter.RestClient(
   keys.access_token_secret
 );
 
+setInterval(function(){
 
 var latestId = '490565814072782848';
 
